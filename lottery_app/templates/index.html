@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum Lottery</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        input, button { margin: 10px 0; }
+        #playersList { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Ethereum Lottery</h1>
+    
+    <h2>Enter Lottery</h2>
+    <input type="text" id="playerAddress" placeholder="Enter your Ethereum address">
+    <input type="text" id="playerName" placeholder="Enter your name">
+    <button onclick="enterLottery()">Enter Lottery</button>
+
+    <h2>Current Players</h2>
+    <div id="playersList"></div>
+
+    <h2>End Game (Manager Only)</h2>
+    <input type="text" id="managerAddress" placeholder="Enter manager's Ethereum address">
+    <button onclick="pickWinner()">End Game</button>
+
+    <script>
+        function enterLottery() {
+            const address = $('#playerAddress').val();
+            const name = $('#playerName').val();
+            $.post('/enter', {account: address, name: name}, function(response) {
+                alert(response.message);
+                if (response.success) {
+                    updatePlayersList();
+                }
+            });
+        }
+
+        function updatePlayersList() {
+            $.get('/get_players', function(players) {
+                let playersList = '<ul>';
+                players.forEach(player => {
+                    playersList += `<li>${player.name} (${player.address})</li>`;
+                });
+                playersList += '</ul>';
+                $('#playersList').html(playersList);
+            });
+        }
+
+        function pickWinner() {
+            const managerAddress = $('#managerAddress').val();
+            $.post('/pick_winner', {account: managerAddress}, function(response) {
+                if (response.success) {
+                    alert(`Congratulations! The winner is ${response.winnerName}`);
+                    updatePlayersList();
+                } else {
+                    alert(response.message);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            updatePlayersList();
+        });
+    </script>
+</body>
+</html>
