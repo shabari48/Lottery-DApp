@@ -9,7 +9,7 @@ ganache_url = "HTTP://127.0.0.1:7545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
 
 # Contract ABI and Address
-contract_address = "0x6899e6797Ed81B5778A7f22F6c2fcAFBECeC6F72"  # Replace with your contract address
+contract_address = ""  ####
 with open('../build/contracts/Lottery.json') as f:
     contract_abi = json.load(f)['abi']
 
@@ -40,7 +40,7 @@ def pick_winner():
     account = request.form['account']
     tx_hash = contract.functions.pickWinner().transact({'from': account})
     web3.eth.wait_for_transaction_receipt(tx_hash)
-    # Retrieve winner details
+    
     winner_addr, winner_name = contract.functions.getWinner().call()
     
     return jsonify({
